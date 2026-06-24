@@ -1,15 +1,21 @@
 import { supabaseServer } from "@/lib/supabaseServer";
 import { type Product, type SafeProduct, getModalTerbaik, calculateShopeePrice, calculateNonShopeePrice } from "@/lib/pricing";
+import { fetchLiveStock, matchStockVariants } from "@/lib/stock";
 import CatalogClient from "@/components/CatalogClient";
 
 export const revalidate = 60; // Cache selama 60 detik (optional, biar cepat)
 
 export default async function Page() {
-  // 1. Fetch data directly on the server
-  const { data: rawProducts, error } = await supabaseServer
-    .from("products")
-    .select("*")
-    .order("nama_produk", { ascending: true });
+  // 1. Fetch data directly on the server (Supabase and Live Stock concurrently)
+  const [supabaseResponse, liveStock] = await Promise.all([
+    supabaseServer
+      .from("products")
+      .select("*")
+      .order("nama_produk", { ascending: true }),
+    fetchLiveStock(),
+  ]);
+
+  const { data: rawProducts, error } = supabaseResponse;
 
   if (error) {
     console.error("Error fetching products:", error);
@@ -26,6 +32,10 @@ export default async function Page() {
   // Kolom "harga_agen", "harga_distributor", dll DIBUANG sepenuhnya di sisi Server ini.
   const safeProducts: SafeProduct[] = products.map((p) => {
     const { modal } = getModalTerbaik(p);
+    
+    // Match the stock variants from Google Sheets
+    const variants = matchStockVariants(p.nama_produk, liveStock);
+
     return {
       id: p.id,
       nama_produk: p.nama_produk,
@@ -33,6 +43,7 @@ export default async function Page() {
       regularPrice: calculateNonShopeePrice(modal),
       shopeePrice: calculateShopeePrice(modal),
       isValid: modal > 0,
+      availableVariants: variants,
     };
   });
 

@@ -142,7 +142,7 @@ export default function CatalogClient({ products }: { products: SafeProduct[] })
                       <span className="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold tracking-widest rounded-lg uppercase mb-3">
                         {product.kategori || "UMUM"}
                       </span>
-                      <h3 className="font-extrabold text-slate-900 text-xl leading-snug line-clamp-2">
+                      <h3 className="font-extrabold text-slate-900 text-xl leading-snug line-clamp-2 mb-3">
                         {product.nama_produk}
                       </h3>
                     </div>
@@ -194,6 +194,34 @@ export default function CatalogClient({ products }: { products: SafeProduct[] })
                               Beli di Shopee
                             </a>
                           </div>
+
+                          {/* Accordion Stok Warna Ready */}
+                          <details className="group border border-slate-100 rounded-2xl bg-white overflow-hidden shadow-sm">
+                            <summary className="flex items-center justify-between p-4 font-semibold text-sm text-slate-700 cursor-pointer list-none select-none hover:bg-slate-50 transition-colors [&::-webkit-details-marker]:hidden">
+                              <div className="flex items-center gap-2">
+                                <Tag className="w-4 h-4 text-slate-400" />
+                                <span>Cek Warna Ready</span>
+                              </div>
+                              <span className="transition duration-300 group-open:rotate-180">
+                                <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16"><path d="M6 9l6 6 6-6"></path></svg>
+                              </span>
+                            </summary>
+                            <div className="px-4 pb-4 border-t border-slate-50 pt-3">
+                              <div className="flex flex-wrap gap-1.5">
+                                {product.availableVariants && product.availableVariants.length > 0 ? (
+                                  product.availableVariants.map((v, idx) => (
+                                    <span key={idx} className="px-2 py-1 bg-slate-800 text-white text-[10px] font-semibold rounded-md uppercase tracking-wider shadow-sm">
+                                      {v}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-semibold rounded-md border border-red-100 uppercase tracking-wider">
+                                    Hubungi Admin
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </details>
                         </>
                       ) : (
                         <div className="py-8 text-center bg-slate-50 rounded-2xl border border-slate-200 border-dashed">

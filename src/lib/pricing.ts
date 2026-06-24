@@ -17,6 +17,7 @@ export type SafeProduct = {
   regularPrice: number;
   shopeePrice: number;
   isValid: boolean;
+  availableVariants: string[];
 };
 
 export const formatRp = (val: number) =>
