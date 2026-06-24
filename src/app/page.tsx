@@ -6,6 +6,21 @@ import CatalogClient from "@/components/CatalogClient";
 export const revalidate = 60; // Cache selama 60 detik (optional, biar cepat)
 
 export default async function Page() {
+  const hasEnvVars = !!process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== "https://empty.supabase.co";
+
+  if (!hasEnvVars) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+        <div className="bg-red-50 border border-red-200 text-red-700 p-8 rounded-2xl max-w-lg text-center shadow-sm">
+          <h2 className="text-xl font-bold mb-4">Konfigurasi Belum Selesai</h2>
+          <p className="mb-4 text-sm">Sistem mendeteksi bahwa kunci rahasia Supabase belum dimasukkan ke Vercel.</p>
+          <p className="text-sm font-semibold">Silakan buka dashboard Vercel &gt; Settings &gt; Environment Variables, lalu masukkan NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY.</p>
+          <p className="text-sm mt-4 text-slate-500">Setelah itu, lakukan Redeploy.</p>
+        </div>
+      </div>
+    );
+  }
+
   // 1. Fetch data directly on the server (Supabase and Live Stock concurrently)
   const [supabaseResponse, liveStock] = await Promise.all([
     supabaseServer
